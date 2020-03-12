@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Logement index{% endblock %}
+
+{% block body %}
+
+
+    <!--Bouton filter-->
+    <div class=" mb-5 mt-3">
+        <a class="btn btn-dark mt-2 mb-2 ml-2" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fas fa-filter text-light"></i>&nbsp;Rechercher
+        </a>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body mb-2">
+                {% dump(form) %}
+                {{ form_start(form) }}
+
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            {{ form_row(form.nomVente) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            {{ form_row(form.typeLogement) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            {{ form_row(form.nombrePiece) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            {% dump(form.localisation) %}
+                            {{ form_row(form.localisation) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            {{ form_row(form.prix) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            {{ form_row(form.surfaceTotale) }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-outline-dark btn-lg btn-block">Rechercher</button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+    <!-- Fin bouton filter -->
+
+
+    <h1 class="text-center">LOGEMENTS</h1>
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="text-center">
+            <a class="text-light text-center" href="{{ path('logement_new') }}"><button type="button" class="btn btn-success">Ajouter</button></a>
+        </div>
+    {% endif %}
+
+    <div class="row mt-5 logement">
+        {% if logement == null %}
+            <div class="mx-auto text-danger">
+            <h2>Aucun logement ne correspond à votre recherche</h2>
+            </div>
+        {% else %}
+            {%  for log in logement %}
+
+                <div class="col-lg-12 mb-5">
+                    <div class="row">
+                        {% set ind=0 %}
+                        <div class="col-lg-6">
+                            {% for media in log.media %}
+                                {% if ind<=0 %}
+                                    {% set ind=ind+1 %}
+                                    <img src="{{ vich_uploader_asset(media, 'imageFile') }}" style="width:100%; height: auto" class="card-img-top" alt="">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        {{ log.typeLogement.nomTypeLogement }} de {{ log.surfaceTotale }}m² à {{ log.localisation.nomLocalisation }} au prix de {{ log.prix }} €
+                                    </h5>
+                                    <hr>
+                                    <h6 class="card-text">
+                                        <p>Type : {{ log.typeLogement.nomTypeLogement }}</p>
+                                        <p>Vente : {{ log.nomVente.nomVente }}</p>
+                                        <p>Localisation : {{ log.localisation.nomLocalisation }}</p>
+                                        <p>Prix : {{ log.prix }} €</p>
+                                        <p>Nombre de pièces : {{ log.nombrePiece }}</p>
+                                        <p>Surface Totale : {{ log.surfaceTotale }}m²</p>
+                                        <p>Description : {{ log.description }}</p>
+                                        <p>Proximité : {{ log.proximite }}</p>
+                                        <p>Dépôt : {{ log.depot }}</p>
+                                    </h6>
+
+                                    <a class="text-light" href="{{ path('logement_show', {'id': log.id}) }}"><button type="button" class="btn btn-info">Voir plus</button></a>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <a class="text-light" href="{{ path('logement_edit', {'id': log.id}) }}"><button type="button" class="btn btn-warning">Modifier</button></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}
